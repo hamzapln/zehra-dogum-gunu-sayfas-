@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> İyi ki doğdun Zehram </title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-bg: #ffe4e1;
+            --text-color: #5c3a3a;
+            --accent: #d87093;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Playfair Display', serif;
+            background-color: var(--pink-bg);
+            color: var(--text-color);
+            background-image: url('https://www.transparenttextures.com/patterns/cream-paper.png');
+            overflow-x: hidden;
+        }
+        /* GİRİŞ EKRANI */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            transition: opacity 1s ease;
+        }
+        .names-title {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+        .pin-container {
+            margin-top: 30px;
+        }
+        .pin-display {
+            font-size: 2rem;
+            letter-spacing: 15px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            gap: 15px;
+            justify-content: center;
+        }
+        .key {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid var(--accent);
+            font-size: 1.5rem;
+            color: var(--accent);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .key:active { background: var(--accent); color: white; }
+        
+        /* ANA İÇERİK (GİZLİ) */
+        #main-content {
+            display: none;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin: 40px 0 20px;
+        }
+
+        /* PUZZLE EFEKTİ */
+        .puzzle-container {
+            width: 100%;
+            aspect-ratio: 1;
+            background-image: url('18907_2.png');
+            background-size: cover;
+            background-position: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        .puzzle-overlay {
+            position: absolute;
+            top:0; left:0; width: 100%; height: 100%;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+        }
+        .piece {
+            border: 1px solid rgba(255,255,255,0.5);
+            background: rgba(255, 228, 225, 0.9);
+            cursor: pointer;
+            transition: opacity 0.5s;
+        }
+        .piece.solved { opacity: 0; pointer-events: none; }
+        .puzzle-hint { text-align: center; font-size: 0.9rem; font-style: italic; }
+
+        /* MEKTUP */
+        .letter {
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            position: relative;
+        }
+        .letter::before {
+            content: '❤️';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+        }
+
+        /* ANI DEFTERİ (SLIDER) */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+            background: #fff;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .slider-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: none;
+            border-radius: 10px;
+        }
+        .slider-img.active { display: block; }
+        .slider-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--accent);
+        }
+        .prev-btn { left: 15px; }
+        .next-btn { right: 15px; }
+
+        /* MÜZİK (SPOTIFY) */
+        .spotify-container iframe {
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        /* ZAMAN SAYACI */
+        .counter-box {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .counter-item {
+            background: var(--pink-bg);
+            padding: 15px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .counter-number { font-size: 1.5rem; color: var(--accent); }
+        .counter-label { font-size: 0.8rem; text-transform: uppercase; margin-top: 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- GİRİŞ EKRANI -->
+    <div id="login-screen">
+        <p style="font-style: italic; margin: 0;">Sadece senin için hazırlandı</p>
+        <div class="names-title">Hamza ❤️ Zehra</div>
+        <p>Küçük sırrımızı gir</p>
+        
+        <div class="pin-container">
+            <div class="pin-display" id="pin-display">_ _ _ _</div>
+            <div class="keypad">
+                <button class="key" onclick="addPin(1)">1</button>
+                <button class="key" onclick="addPin(2)">2</button>
+                <button class="key" onclick="addPin(3)">3</button>
+                <button class="key" onclick="addPin(4)">4</button>
+                <button class="key" onclick="addPin(5)">5</button>
+                <button class="key" onclick="addPin(6)">6</button>
+                <button class="key" onclick="addPin(7)">7</button>
+                <button class="key" onclick="addPin(8)">8</button>
+                <button class="key" onclick="addPin(9)">9</button>
+                <button class="key" onclick="clearPin()">C</button>
+                <button class="key" onclick="addPin(0)">0</button>
+                <button class="key" onclick="checkPin()">OK</button>
+            </div>
+        </div>
+        <p id="error-msg" style="color: red; opacity: 0;">Yanlış şifre sevgilim, tekrar dene.</p>
+    </div>
+
+    <!-- ANA SAYFA İÇERİĞİ -->
+    <div id="main-content">
+        
+        <div class="section-title">Fotoğrafımızı Çöz 🧩</div>
+        <p class="puzzle-hint">Küçük karelere dokun ve fotoğrafımızı tamamla.</p>
+        <div class="puzzle-container">
+            <div class="puzzle-overlay" id="puzzle-overlay">
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+                <div class="piece" onclick="solvePiece(this)"></div>
+            </div>
+        </div>
+
+        <div class="section-title">Kalbimden Bir Mektup 📝</div>
+        <div class="letter">
+            <p>Sevgilim, hayatımın en güzel 'iyi ki'si,</p>
+            <p>Zaman seninle akarken, her saniyesi ayrı bir anlam kazanıyor. Gülüşün karanlık günlerimi aydınlatan güneşim, gözlerin ise huzurla kaybolduğum en güzel liman oldu.</p>
+            <p>Birlikte güldüğümüz, kelimelere ihtiyaç duymadan sessizce anlaştığımız o anlar benim için paha biçilemez. 28 Ocak'tan beri hayatıma kattığın her renk, bana hissettirdiğin o eşsiz sevgi için sana minnettarım.</p>
+            <p>Seni her geçen gün daha da büyüyen, kocaman bir aşkla seviyorum. İyi ki varsın, iyi ki benimsin...</p>
+        </div>
+
+        <div class="section-title">Küçük Anı Defterimiz 📸</div>
+        <div class="slider-container">
+            <img src="1502.jpg" class="slider-img active">
+            <img src="18175.jpg" class="slider-img">
+            <img src="10036.jpg" class="slider-img">
+            <img src="10025.jpg" class="slider-img">
+            <img src="9921.jpg" class="slider-img">
+            <img src="9908.jpg" class="slider-img">
+            <img src="9419.jpg" class="slider-img">
+            <img src="9437.jpg" class="slider-img">
+            <img src="9422.jpg" class="slider-img">
+            
+            <button class="slider-btn prev-btn" onclick="changeSlide(-1)">❮</button>
+            <button class="slider-btn next-btn" onclick="changeSlide(1)">❯</button>
+        </div>
+
+        <div class="section-title">Şarkılarımızı Dinleyelim 🎵</div>
+        <div class="spotify-container">
+            <!-- Empire of the Sun - We Are The People -->
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/19Gp1qVw7qCTitVJR1KIFe?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+            
+            <!-- Yalın - Sesinde Aşk Var -->
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/3FuVKtxVDmWFNJClkTyzmX?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+
+        <div class="section-title">Seninle Geçen Her Saniye ⏳</div>
+        <div class="counter-box">
+            <div class="counter-item">
+                <div class="counter-number" id="c-days">0</div>
+                <div class="counter-label">Gün</div>
+            </div>
+            <div class="counter-item">
+                <div class="counter-number" id="c-hours">0</div>
+                <div class="counter-label">Saat</div>
+            </div>
+            <div class="counter-item">
+                <div class="counter-number" id="c-mins">0</div>
+                <div class="counter-label">Dakika</div>
+            </div>
+            <div class="counter-item">
+                <div class="counter-number" id="c-secs">0</div>
+                <div class="counter-label">Saniye</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ŞİFRE MANTIĞI (Şifre: 2801)
+        let currentPin = "";
+        const correctPin = "2801";
+        const display = document.getElementById('pin-display');
+        const errorMsg = document.getElementById('error-msg');
+
+        function updateDisplay() {
+            let showStr = currentPin.padEnd(4, '_').split('').join(' ');
+            display.innerText = showStr;
+        }
+
+        function addPin(num) {
+            if (currentPin.length < 4) {
+                currentPin += num;
+                updateDisplay();
+                errorMsg.style.opacity = 0;
+            }
+        }
+
+        function clearPin() {
+            currentPin = "";
+            updateDisplay();
+        }
+
+        function checkPin() {
+            if (currentPin === correctPin) {
+                document.getElementById('login-screen').style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-content').style.display = 'block';
+                    setTimeout(() => {
+                        document.getElementById('main-content').style.opacity = 1;
+                    }, 100);
+                }, 1000);
+            } else {
+                errorMsg.style.opacity = 1;
+                clearPin();
+            }
+        }
+
+        // YAPBOZ MANTIĞI
+        function solvePiece(el) {
+            el.classList.add('solved');
+        }
+
+        // SLIDER (ANI DEFTERİ) MANTIĞI
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.slider-img');
+        
+        function changeSlide(n) {
+            slides[slideIndex].classList.remove('active');
+            slideIndex = (slideIndex + n + slides.length) % slides.length;
+            slides[slideIndex].classList.add('active');
+        }
+
+        // ZAMAN SAYACI MANTIĞI (28 Ocak 2025)
+        const startDate = new Date("2025-01-28T00:00:00").getTime();
+        
+        setInterval(() => {
+            const now = new Date().getTime();
+            let distance = now - startDate;
+            
+            // Eğer tarih henüz gelmediyse sıfırda tut (eksiye düşmemesi için)
+            if(distance < 0) distance = 0; 
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("c-days").innerText = days;
+            document.getElementById("c-hours").innerText = hours;
+            document.getElementById("c-mins").innerText = minutes;
+            document.getElementById("c-secs").innerText = seconds;
+        }, 1000);
+
+    </script>
+</body>
+</html>
